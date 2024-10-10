@@ -11,6 +11,7 @@ export default class MainScene extends Phaser.Scene {
         this.load.spritesheet('witchJump', 'assets/player/JumpAnimation.png', { frameWidth: 85, frameHeight: 56 });
         this.load.spritesheet('idleWitch', 'assets/player/IdleAnimation.png', { frameWidth: 85, frameHeight: 56 });
         this.load.spritesheet('witchAttack', 'assets/player/AttackAnimation.png', { frameWidth: 85, frameHeight: 56 });
+        this.load.spritesheet('magicSpell', 'assets/player/MagicSpellSpriteSheet.png', { frameWidth: 32, frameHeight: 16 });
 
         this.load.image('ground', 'assets/backgrounds/spookyGround4.png');
         this.load.image('candy', 'assets/collectables/candy2.png');
@@ -46,6 +47,11 @@ export default class MainScene extends Phaser.Scene {
         this.graveGroup = this.physics.add.group();
         this.physics.add.collider(this.graveGroup, this.ground);
 
+        //Spell Group
+        this.spellsGroup = this.physics.add.group({
+            gravityY:0
+        });
+
         //Timed Events
         this.time.addEvent({
             delay: 2000,
@@ -55,7 +61,7 @@ export default class MainScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: Phaser.Math.Between(2000, 3000),
+            delay: Phaser.Math.Between(2000, 5000),
             callback: this.addGravestone,
             callbackScope: this,
             loop: true
@@ -68,6 +74,10 @@ export default class MainScene extends Phaser.Scene {
 
         this.physics.add.overlap(this.player.sprite, this.graveGroup, (player, grave) => {
             this.takeDamage(player, grave, 30);  
+        }, null, this);
+
+        this.physics.add.overlap(this.spellsGroup, this.batGroup, (spell, bat) => {
+            this.killBat(spell, bat);
         }, null, this);
 
         this.physics.world.createDebugGraphic();
@@ -168,7 +178,8 @@ export default class MainScene extends Phaser.Scene {
             runKey: 'run',
             jumpKey: 'witchJump',
             deathKey: 'witchDeath',
-            attackKey: 'witchAttack'
+            attackKey: 'witchAttack', 
+            spellKey: 'magicSpell'
         });
 
         this.physics.add.collider(this.player.sprite, this.ground);
@@ -214,6 +225,14 @@ export default class MainScene extends Phaser.Scene {
             bat.body.setSize(bat.width * 0.5, bat.height * 0.5);
             bat.body.setOffset(bat.width * 0.25, bat.height * 0.25);
         } 
+    }
+
+    killBat(spell, bat) {
+        spell.destroy();
+        bat.destroy();
+    
+        this.score += 100;
+        this.scoreText.setText('Score: ' + this.score);
     }
 
     takeDamage(player, source, damageAmount) {

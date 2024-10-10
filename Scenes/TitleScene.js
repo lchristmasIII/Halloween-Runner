@@ -25,7 +25,6 @@ export default class TitleScene extends Phaser.Scene {
         this.physics.world.bounds.width = 800;
         this.physics.world.bounds.height = 400;
 
-        // Set up background
         this.titlelayer1 = this.add.tileSprite(0, 0, 800, 400, 'titlelayer1').setOrigin(0, 0);
         this.titlelayer2 = this.add.tileSprite(0, 0, 800, 400, 'titlelayer2').setOrigin(0, 0);
         this.titlelayer3 = this.add.tileSprite(0, 0, 800, 400, 'titlelayer3').setOrigin(0, 0);
@@ -44,18 +43,15 @@ export default class TitleScene extends Phaser.Scene {
             runKey: 'run'
         });
 
-        this.player.idle(); 
-
         this.physics.add.collider(this.player.sprite, this.ground);
 
+        this.player.idle(); 
 
-        // Add title text
         this.add.text(400, 150, 'Halloween Runner', {
             fontSize: '48px',
             fill: '#fff'
         }).setOrigin(0.5);
 
-        // Create Start button
         const startButton = this.add.text(400, 200, 'Start Game', {
             fontSize: '32px',
             fill: '#fff',
@@ -63,10 +59,8 @@ export default class TitleScene extends Phaser.Scene {
             padding: { left: 10, right: 10, top: 5, bottom: 5 }
         }).setOrigin(0.5);
 
-        // Add interaction to Start button
         startButton.setInteractive();
 
-        // When the button is clicked, transition to the MainScene
         startButton.on('pointerdown', () => {
             this.startGame(); 
         });
@@ -77,11 +71,10 @@ export default class TitleScene extends Phaser.Scene {
         
         this.tweens.add({
             targets: this.player.sprite,
-            x: 800,  // Move to the right edge of the screen
-            duration: 2000,  // Adjust speed
+            x: 800, 
+            duration: 2000, 
             ease: 'Power1',
             onComplete: () => {
-                // Transition to the main game scene after the run finishes
                 this.scene.start('MainScene');
             }
         });

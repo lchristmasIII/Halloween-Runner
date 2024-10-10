@@ -1,36 +1,24 @@
 export default class Player {
     constructor(scene, x, y, animations) {
         this.scene = scene;
-
-        // Load animations for run, jump, and death
         this.createAnimations(animations);
-
-        // Add player sprite
         this.sprite = this.scene.physics.add.sprite(x, y, animations.idleKey);
         this.sprite.setBounce(0.2);
         this.sprite.setCollideWorldBounds(true);
         this.sprite.setScale(2);
-
-        // Start with running animation
         this.sprite.anims.play(animations.idleKey);
-
-        // Set player health
         this.health = 30;
-
-        // Adjust hitbox size and offset
         this.sprite.body.setSize(this.sprite.width * 0.2, this.sprite.height);
     }
 
-    // Create player animations
     createAnimations(animations) {
         this.scene.anims.create({
-            key: animations.idlekey,
-            frames: this.scene.anims.generateFrameNumbers(animations.idlekey, { start: 0, end: 12 }),
-            frameRate: 5,
-            repeat: 0
+            key: animations.idleKey,
+            frames: this.scene.anims.generateFrameNumbers(animations.idleKey, { start: 0, end: 12 }),
+            frameRate: 12,
+            repeat: -1
         });
 
-        // Run animation
         this.scene.anims.create({
             key: animations.runKey,
             frames: this.scene.anims.generateFrameNumbers(animations.runKey, { start: 0, end: 15 }),
@@ -38,7 +26,6 @@ export default class Player {
             repeat: -1
         });
 
-        // Jump animation
         this.scene.anims.create({
             key: animations.jumpKey,
             frames: this.scene.anims.generateFrameNumbers(animations.jumpKey, { start: 0, end: 14 }),
@@ -46,7 +33,6 @@ export default class Player {
             repeat: 0
         });
 
-        // Attack animation
         this.scene.anims.create({
             key: animations.attackKey,
             frames: this.scene.anims.generateFrameNumbers(animations.attackKey, { start: 0, end: 9 }),
@@ -54,7 +40,13 @@ export default class Player {
             repeat: 0
         });
 
-        // Death animation
+        this.scene.anims.create({
+            key: animations.spellKey,
+            frames: this.scene.anims.generateFrameNumbers(animations.spellKey, { start: 0, end: 5 }),
+            frameRate: 10,
+            repeat: 0
+        });
+
         this.scene.anims.create({
             key: animations.deathKey,
             frames: this.scene.anims.generateFrameNumbers(animations.deathKey, { start: 0, end: 9 }),
@@ -70,8 +62,7 @@ export default class Player {
     run() {
         this.sprite.anims.play('run');
     }
-
-    // Handle jumping
+ 
     jump() {
         if (this.sprite.body.touching.down) {
             this.sprite.setVelocityY(-400);
@@ -84,12 +75,22 @@ export default class Player {
 
     attack() {
         this.sprite.anims.play('witchAttack');
+        const spell = this.scene.physics.add.sprite(this.sprite.x, this.sprite.y, 'magicSpell');
+        spell.body.setAllowGravity(false);
+        spell.setVelocityX(200);
+        spell.anims.play('magicSpell');
+
+        spell.on('animationcomplete', () => {
+            spell.destroy();
+        });
+    
+        this.scene.spellsGroup.add(spell);
+
         this.sprite.on('animationcomplete', () => {
             this.sprite.anims.play('run');
         }); 
     }
 
-    // Handle taking damage
     takeDamage(amount) {
         this.health -= amount;
 
@@ -98,7 +99,6 @@ export default class Player {
         }
     }
 
-    // Trigger game over
     gameOver() {
         this.sprite.anims.play('witchDeath');
         this.sprite.on('animationcomplete', () => {
