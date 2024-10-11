@@ -47,7 +47,7 @@ export default class TitleScene extends Phaser.Scene {
 
         this.player.idle(); 
 
-        this.add.text(400, 150, 'Halloween Runner', {
+        this.add.text(400, 150, 'Candy Collector', {
             fontSize: '48px',
             fill: '#fff'
         }).setOrigin(0.5);
@@ -56,6 +56,14 @@ export default class TitleScene extends Phaser.Scene {
             fontSize: '32px',
             fill: '#fff',
             backgroundColor: '#000',
+            padding: { left: 10, right: 10, top: 5, bottom: 5 }
+        }).setOrigin(0.5);
+
+        this.add.text(400, 300, 'Up Arrow: Jump\nSpace: Cast Spell', {
+            fontSize: '22px',
+            fill: '#fff',
+            align: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional background styling
             padding: { left: 10, right: 10, top: 5, bottom: 5 }
         }).setOrigin(0.5);
 

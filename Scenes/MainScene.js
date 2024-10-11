@@ -11,7 +11,7 @@ export default class MainScene extends Phaser.Scene {
         this.load.spritesheet('witchJump', 'assets/player/JumpAnimation.png', { frameWidth: 85, frameHeight: 56 });
         this.load.spritesheet('idleWitch', 'assets/player/IdleAnimation.png', { frameWidth: 85, frameHeight: 56 });
         this.load.spritesheet('witchAttack', 'assets/player/AttackAnimation.png', { frameWidth: 85, frameHeight: 56 });
-        this.load.spritesheet('magicSpell', 'assets/player/MagicSpellSpriteSheet.png', { frameWidth: 32, frameHeight: 16 });
+        this.load.spritesheet('magicSpell', 'assets/player/MagicSpellSpriteSheet.png', { frameWidth: 27, frameHeight: 16 });
 
         this.load.image('ground', 'assets/backgrounds/spookyGround4.png');
         this.load.image('candy', 'assets/collectables/candy2.png');
@@ -32,6 +32,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
+        this.isGameOver = false;
         this.setupWorld();
         this.setupPlayer();
         this.setupBats();
@@ -53,14 +54,14 @@ export default class MainScene extends Phaser.Scene {
         });
 
         //Timed Events
-        this.time.addEvent({
+        this.candyEvent = this.time.addEvent({
             delay: 2000,
             callback: this.addCandy,
             callbackScope: this,
             loop: true
         });
 
-        this.time.addEvent({
+        this.graveEvent = this.time.addEvent({
             delay: Phaser.Math.Between(2000, 5000),
             callback: this.addGravestone,
             callbackScope: this,
@@ -80,7 +81,7 @@ export default class MainScene extends Phaser.Scene {
             this.killBat(spell, bat);
         }, null, this);
 
-        this.physics.world.createDebugGraphic();
+        //this.physics.world.createDebugGraphic();
     }
 
     update() {
@@ -88,17 +89,19 @@ export default class MainScene extends Phaser.Scene {
             this.player.jump();
         }
 
-        if (this.cursors.space.isDown) {
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.space)) {
             this.player.attack();
         }
 
-        this.ground.tilePositionX += 2.0;
-        this.layer1.tilePositionX += 0.5; // Slowest layer
-        this.layer2.tilePositionX += 0.8;
-        this.layer3.tilePositionX += 1.2;
-        this.layer4.tilePositionX += 1.5;
-        this.layer5.tilePositionX += 1.8;
-        this.layer6.tilePositionX += 2.0; // Fastest layer
+        if(!this.isGameOver) {
+            this.ground.tilePositionX += 2.0;
+            this.layer1.tilePositionX += 0.5; // Slowest layer
+            this.layer2.tilePositionX += 0.8;
+            this.layer3.tilePositionX += 1.2;
+            this.layer4.tilePositionX += 1.5;
+            this.layer5.tilePositionX += 1.8;
+            this.layer6.tilePositionX += 2.0; // Fastest layer
+        }
 
         if (this.score >= 600 && !this.batEvent) {
             this.batEvent = this.time.addEvent({
@@ -253,10 +256,22 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
-    gameOver() {
+    removeTimedEvents() {
         if(this.batEvent) {
             this.batEvent.remove();
         }
+
+        if(this.candyEvent) {
+            this.candyEvent.remove();
+        }
+
+        if(this.graveEvent) {
+            this.graveEvent.remove();
+        }
+    }
+
+    gameOver() {   
+        this.removeTimedEvents();
 
         this.add.text(400, 200, 'Game Over', {
             fontSize: '64px',
@@ -269,6 +284,8 @@ export default class MainScene extends Phaser.Scene {
             backgroundColor: '#000',
             padding: { left: 10, right: 10, top: 5, bottom: 5 }
         }).setOrigin(0.5);
+
+        this.isGameOver = true;   
 
         replayButton.setInteractive();
 

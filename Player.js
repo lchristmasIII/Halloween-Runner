@@ -43,7 +43,7 @@ export default class Player {
         this.scene.anims.create({
             key: animations.spellKey,
             frames: this.scene.anims.generateFrameNumbers(animations.spellKey, { start: 0, end: 5 }),
-            frameRate: 10,
+            frameRate: 5,
             repeat: 0
         });
 
@@ -76,15 +76,12 @@ export default class Player {
     attack() {
         this.sprite.anims.play('witchAttack');
         const spell = this.scene.physics.add.sprite(this.sprite.x, this.sprite.y, 'magicSpell');
-        spell.body.setAllowGravity(false);
-        spell.setVelocityX(200);
+        
         spell.anims.play('magicSpell');
-
-        spell.on('animationcomplete', () => {
-            spell.destroy();
-        });
     
         this.scene.spellsGroup.add(spell);
+        spell.body.setAllowGravity(false);
+        spell.setVelocityX(200);
 
         this.sprite.on('animationcomplete', () => {
             this.sprite.anims.play('run');
